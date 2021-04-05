@@ -1,0 +1,261 @@
+
+正/负 12115/401096
+33.107387536112256 32.08326661329063
+Index(['p_date', 'target_is_DD_ACTIVE', 'p3week_active', 'p4week_active',
+       'p7week_active', 'd14_p1week_active', 'd14_p2week_active',
+       'd14_p3week_active', 'd14_p4week_active', 'd14_p5week_active',
+       ...
+       'CAFE20_levels_0', 'CAFE20_levels_0.Gold Monthly 8+',
+       'CAFE20_levels_1.Gold Monthly 4-8', 'CAFE20_levels_2.Gold Monthly 2-4',
+       'CAFE20_levels_3.Gold Monthly 1-2',
+       'CAFE20_levels_4.Gold Less than once', 'CAFE20_levels_5.Green 3+',
+       'CAFE20_levels_6.Green 1-3', 'CAFE20_levels_8.Welcome 1+',
+       'CAFE20_levels_9.Welcome 1'],
+      dtype='object', length=165)
+x_train (289247, 164)
+-------------------Rf-------------------------
+{'criterion': 'gini', 'max_depth': 6, 'max_features': 9, 'n_estimators': 23}
+================训练集================
+              precision    recall  f1-score   support
+           0       0.99      0.80      0.88    280816
+           1       0.08      0.60      0.15      8431
+    accuracy                           0.79    289247
+   macro avg       0.53      0.70      0.51    289247
+weighted avg       0.96      0.79      0.86    289247
+[[224319  56497]
+ [  3346   5085]]
+================测试集================
+              precision    recall  f1-score   support
+           0       0.98      0.80      0.88    120280
+           1       0.08      0.59      0.15      3684
+    accuracy                           0.79    123964
+   macro avg       0.53      0.70      0.51    123964
+weighted avg       0.96      0.79      0.86    123964
+[[96131 24149]
+ [ 1499  2185]]
+===========b_test===================
+              precision    recall  f1-score   support
+           0       0.98      0.80      0.88     40072
+           1       0.08      0.58      0.14      1249
+    accuracy                           0.79     41321
+   macro avg       0.53      0.69      0.51     41321
+weighted avg       0.96      0.79      0.86     41321
+[[31892  8180]
+ [  527   722]]
+================Importance================
+                            features  importance
+92                        CAFE20_AMT       0.118
+51                         level_use       0.072
+88               CAFE20_MONTHLY_FREQ       0.052
+30                           recency       0.042
+81             cafe_tag_p3m_food_qty       0.040
+77         cafe_tag_p3m_monthly_freq       0.039
+69         cafe_tag_p6m_monthly_freq       0.033
+101               CAFE20_VISIT_MERCH       0.031
+90                    CAFE20_RECENCY       0.030
+41                         p6m_trans       0.024
+72      cafe_tag_p6m_food_party_size       0.023
+39                 p3m_weekday_trans       0.021
+18                    msr_lifestatus       0.021
+50                         total_amt       0.020
+26                      monthly_freq       0.018
+16                 d10_p8week_active       0.018
+155  CAFE20_levels_0.Gold Monthly 8+       0.018
+73             cafe_tag_p6m_food_qty       0.015
+24                      active_index       0.015
+87                     CAFE20_VISITS       0.014
+78     cafe_tag_p3m_merch_party_size       0.013
+100             CAFE20_RECENCY_MERCH       0.013
+130                       DD_end_gap       0.013
+2                      p4week_active       0.012
+127                           DD_rev       0.011
+52                     is_merch_user       0.010
+70     cafe_tag_p6m_merch_party_size       0.010
+53                  is_festival_user       0.010
+19                   member_monetary       0.010
+71            cafe_tag_p6m_merch_qty       0.009
+-------------------XGBOOST-------------------------
+{'learning_rate': 0.1, 'max_depth': 7, 'min_child_weight': 6, 'n_estimators': 24, 'scale_pos_weight': 28.30755545012454, 'subsample': 0.85}
+================训练集================
+              precision    recall  f1-score   support
+           0       0.99      0.83      0.90    280816
+           1       0.11      0.65      0.18      8431
+    accuracy                           0.83    289247
+   macro avg       0.55      0.74      0.54    289247
+weighted avg       0.96      0.83      0.88    289247
+[[233950  46866]
+ [  2931   5500]]
+================测试集==============
+              precision    recall  f1-score   support
+           0       0.98      0.83      0.90    120280
+           1       0.09      0.57      0.16      3684
+    accuracy                           0.82    123964
+   macro avg       0.54      0.70      0.53    123964
+weighted avg       0.96      0.82      0.88    123964
+[[99981 20299]
+ [ 1592  2092]]
+===========b_test===================
+              precision    recall  f1-score   support
+           0       0.98      0.83      0.90     40072
+           1       0.09      0.56      0.16      1249
+    accuracy                           0.82     41321
+   macro avg       0.54      0.70      0.53     41321
+weighted avg       0.96      0.82      0.88     41321
+[[33284  6788]
+ [  550   699]]
+================Importance================
+                          features  importance
+51                       level_use       0.143
+53                is_festival_user       0.032
+52                   is_merch_user       0.028
+78   cafe_tag_p3m_merch_party_size       0.027
+77       cafe_tag_p3m_monthly_freq       0.027
+70   cafe_tag_p6m_merch_party_size       0.025
+30                         recency       0.021
+92                      CAFE20_AMT       0.021
+24                    active_index       0.020
+125                       DD_units       0.020
+85                  IS_SR_KIT_USER       0.019
+127                         DD_rev       0.019
+128                     max_DD_rev       0.018
+42                         p6m_amt       0.018
+73           cafe_tag_p6m_food_qty       0.017
+143                    MCoffer_red       0.016
+101             CAFE20_VISIT_MERCH       0.013
+16               d10_p8week_active       0.012
+102           CAFE20_RECENCY_SRKIT       0.012
+55                     svc_revenue       0.011
+130                     DD_end_gap       0.010
+81           cafe_tag_p3m_food_qty       0.010
+163      CAFE20_levels_9.Welcome 1       0.010
+100           CAFE20_RECENCY_MERCH       0.009
+153               CAFE20_region_SH       0.009
+138                         MC_rev       0.009
+67       cafe_tag_is_mop_available       0.009
+90                  CAFE20_RECENCY       0.009
+17                      disc_trans       0.008
+148               CAFE20_region_CW       0.008
+==========LGB===========
+[LightGBM] [Warning] Find whitespaces in feature_names, replace with underlines
+[LightGBM] [Info] Total Bins 2118
+[LightGBM] [Info] Number of data points in the train set: 289247, number of used features: 162
+[LightGBM] [Info] Start training from score 0.459426
+================训练集================
+              precision    recall  f1-score   support
+           0       0.99      0.82      0.90    280816
+           1       0.09      0.60      0.16      8431
+    accuracy                           0.82    289247
+   macro avg       0.54      0.71      0.53    289247
+weighted avg       0.96      0.82      0.87    289247
+[[230790  50026]
+ [  3385   5046]]
+================测试集================
+              precision    recall  f1-score   support
+           0       0.98      0.82      0.90    120280
+           1       0.09      0.58      0.16      3684
+    accuracy                           0.82    123964
+   macro avg       0.54      0.70      0.53    123964
+weighted avg       0.96      0.82      0.87    123964
+[[98892 21388]
+ [ 1532  2152]]
+===========b_test===================
+              precision    recall  f1-score   support
+           0       0.98      0.82      0.89     40072
+           1       0.09      0.57      0.16      1249
+    accuracy                           0.81     41321
+   macro avg       0.54      0.70      0.53     41321
+weighted avg       0.96      0.81      0.87     41321
+[[32871  7201]
+ [  534   715]]
+================Importance================
+                          features  importance
+53                is_festival_user         155
+55                     svc_revenue         150
+153               CAFE20_region_SH         142
+94              CAFE20_RECENCY_APP         137
+51                       level_use         127
+73           cafe_tag_p6m_food_qty         110
+102           CAFE20_RECENCY_SRKIT         109
+85                  IS_SR_KIT_USER          99
+24                    active_index          81
+52                   is_merch_user          72
+129                  DD_launch_gap          67
+112          CAFE20_P1Y_VISITS_DAY          61
+67       cafe_tag_is_mop_available          58
+127                         DD_rev          57
+140                  MC_launch_gap          57
+92                      CAFE20_AMT          57
+101             CAFE20_VISIT_MERCH          52
+0                           p_date          51
+30                         recency          51
+119        is_LAST_2YEAR_DD_ACTIVE          51
+138                         MC_rev          48
+90                  CAFE20_RECENCY          46
+63                 food_party_size          46
+21                        citytier          43
+100           CAFE20_RECENCY_MERCH          42
+78   cafe_tag_p3m_merch_party_size          39
+142                    MCoffer_rec          39
+93                      CAFE20_age          38
+70   cafe_tag_p6m_merch_party_size          35
+148               CAFE20_region_CW          35
+-------------------CATBOOST-------------------------
+{'class_weights': [1, 28.30755545012454], 'depth': 9, 'learning_rate': 0.1, 'n_estimators': 19}
+================训练集================
+              precision    recall  f1-score   support
+           0       0.99      0.80      0.89    280816
+           1       0.09      0.64      0.16      8431
+    accuracy                           0.80    289247
+   macro avg       0.54      0.72      0.52    289247
+weighted avg       0.96      0.80      0.86    289247
+[[225735  55081]
+ [  3070   5361]]
+================测试集==============
+              precision    recall  f1-score   support
+           0       0.98      0.80      0.89    120280
+           1       0.09      0.60      0.15      3684
+    accuracy                           0.80    123964
+   macro avg       0.54      0.70      0.52    123964
+weighted avg       0.96      0.80      0.86    123964
+[[96703 23577]
+ [ 1489  2195]]
+===========b_test===================
+              precision    recall  f1-score   support
+           0       0.98      0.80      0.88     40072
+           1       0.08      0.58      0.15      1249
+    accuracy                           0.80     41321
+   macro avg       0.53      0.69      0.52     41321
+weighted avg       0.96      0.80      0.86     41321
+[[32158  7914]
+ [  525   724]]
+                         features  importance
+153              CAFE20_region_SH       5.215
+51                      level_use       4.476
+0                          p_date       3.896
+55                    svc_revenue       3.760
+24                   active_index       3.538
+112         CAFE20_P1Y_VISITS_DAY       3.375
+17                     disc_trans       3.224
+63                food_party_size       3.184
+92                     CAFE20_AMT       2.841
+77      cafe_tag_p3m_monthly_freq       2.680
+79         cafe_tag_p3m_merch_qty       2.637
+73          cafe_tag_p6m_food_qty       2.402
+129                 DD_launch_gap       2.149
+26                   monthly_freq       2.060
+101            CAFE20_VISIT_MERCH       2.054
+30                        recency       1.842
+91               CAFE20_STARTDAYS       1.784
+85                 IS_SR_KIT_USER       1.695
+86                     SR_KIT_NUM       1.612
+139                    max_MC_rev       1.583
+72   cafe_tag_p6m_food_party_size       1.558
+103            CAFE20_VISIT_SRKIT       1.457
+25            beverage_party_size       1.449
+100          CAFE20_RECENCY_MERCH       1.372
+124                  DD_order_num       1.364
+142                   MCoffer_rec       1.344
+137               max_MC_Quantity       1.307
+71         cafe_tag_p6m_merch_qty       1.223
+94             CAFE20_RECENCY_APP       1.213
+43            p6m_daypart01_trans       1.173
