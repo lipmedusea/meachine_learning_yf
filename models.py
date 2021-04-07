@@ -64,7 +64,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         'learning_rate': [1, 0.1, 0.05],
         'algorithm': ["SAMME", "SAMME.R"]
                  }
-    dt_score = make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -100,7 +100,7 @@ def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         'penalty': ['l2'],
         'max_iter': [30, 50, 100,]
     }
-    dt_score = make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -135,8 +135,8 @@ def rf_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         'max_features': range(8, 10),
         # 'class_weight': [{1: i} for i in np.linspace(tt, tt+1, 1)]
                  }
-    dt_score = make_scorer(f1_score, pos_label=1)
-    make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
+    make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -189,8 +189,8 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                   # "min_impurity_decrease": [None],
                   # "max_leaf_nodes": [None],
                   }
-    dt_score = make_scorer(f1_score, pos_label=1)
-    make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
+    make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -235,7 +235,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                      "class_weight": [{1: i} for i in np.linspace(tt, tt+1, 1)],
                      "subsample": [1, 0.85]
                   }
-    dt_score = make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -345,8 +345,7 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         "min_child_weight":range(6,7),
         "max_depth": range(3, 8),
     }
-    dt_score = make_scorer(f1_score, pos_label=1)
-    make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -406,7 +405,8 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         "depth": range(5, 10),
     #     # "class_weights" :[1, 7],
     }
-    dt_score = make_scorer(f1_score, pos_label=1)
+    
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -524,148 +524,6 @@ import numpy as np
 import operator
 
 
-class MajorityVoteClassifier(BaseEstimator,
-                             ClassifierMixin):
-    """ A majority vote ensemble classifier
-
-    Parameters
-    ----------
-    classifiers : array-like, shape = [n_classifiers]
-      Different classifiers for the ensemble
-
-    vote : str, {'classlabel', 'probability'} (default='label')
-      If 'classlabel' the prediction is based on the argmax of
-        class labels. Else if 'probability', the argmax of
-        the sum of probabilities is used to predict the class label
-        (recommended for calibrated classifiers).
-
-    weights : array-like, shape = [n_classifiers], optional (default=None)
-      If a list of `int` or `float` values are provided, the classifiers
-      are weighted by importance; Uses uniform weights if `weights=None`.
-
-    """
-
-    def __init__(self, classifiers, vote='classlabel', weights=None, boundary=0.5):
-
-        self.classifiers = classifiers
-        self.named_classifiers = {key: value for key, value
-                                  in _name_estimators(classifiers)}
-        self.vote = vote
-        self.weights = weights
-        self.boundary = boundary
-
-    def fit(self, X, y):
-        cout = Counter(y)
-        tt = cout[0] / cout[1]  - 20
-        sample_weigh = np.where(y == 0, 1, 2.7)
-        """ Fit classifiers.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
-
-        y : array-like, shape = [n_samples]
-            Vector of target class labels.
-
-        Returns
-        -------
-        self : object
-
-        """
-        if self.vote not in ('probability', 'classlabel'):
-            raise ValueError("vote must be 'probability' or 'classlabel'"
-                             "; got (vote=%r)"
-                             % self.vote)
-
-        if self.weights and len(self.weights) != len(self.classifiers):
-            raise ValueError('Number of classifiers and weights must be equal'
-                             '; got %d weights, %d classifiers'
-                             % (len(self.weights), len(self.classifiers)))
-
-        # Use LabelEncoder to ensure class labels start with 0, which
-        # is important for np.argmax call in self.predict
-        self.lablenc_ = LabelEncoder()
-        self.lablenc_.fit(y)
-        self.classes_ = self.lablenc_.classes_
-        self.classifiers_ = []
-
-        i = 1
-        for clf in self.classifiers:
-            if i<4:
-                fitted_clf = clone(clf).fit(X, self.lablenc_.transform(y),
-                                            sample_weight=sample_weigh
-                                            )
-                self.classifiers_.append(fitted_clf)
-            else:
-                fitted_clf = clone(clf).fit(X, self.lablenc_.transform(y),cat_features=np.arange(11),
-                                            sample_weight=sample_weigh
-                                            )
-                self.classifiers_.append(fitted_clf)
-            i = i + 1
-
-        return self
-
-    def predict(self, X):
-        """ Predict class labels for X.
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Matrix of training samples.
-        Returns
-        ----------
-        maj_vote : array-like, shape = [n_samples]
-            Predicted class labels.
-        """
-        if self.vote == 'probability':
-            maj_vote = np.argmax(self.predict_proba(X), axis=1)
-            maj_vote = np.where(pd.DataFrame(self.predict_proba(X))[1]>self.boundary,1,0)
-
-        else:
-            # 'classlabel' vote
-
-            #  Collect results from clf.predict calls
-            predictions = np.asarray([clf.predict for clf in self.classifiers_]).T
-
-            maj_vote = np.apply_along_axis(
-                lambda x:
-                np.argmax(np.bincount(x,weights=self.weights)),axis=1,arr=predictions)
-        maj_vote = self.lablenc_.inverse_transform(maj_vote)
-        return maj_vote
-
-    def predict_proba(self, X):
-        """ Predict class probabilities for X.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix}, shape = [n_samples, n_features]
-            Training vectors, where n_samples is the number of samples and
-            n_features is the number of features.
-
-        Returns
-        ----------
-        avg_proba : array-like, shape = [n_samples, n_classes]
-            Weighted average probability for each class per sample.
-
-        """
-        probas = np.asarray([clf.predict_proba(X)
-                             for clf in self.classifiers_])
-        avg_proba = np.average(probas, axis=0, weights=self.weights)
-        return avg_proba
-
-
-    def get_params(self, deep=True):
-        """ Get classifier parameter names for GridSearch"""
-        if not deep:
-            return super(MajorityVoteClassifier, self).get_params(deep=False)
-        else:
-            out = self.named_classifiers.copy()
-            for name, step in six.iteritems(self.named_classifiers):
-                for key, value in six.iteritems(step.get_params(deep=True)):
-                    out['%s__%s' % (name, key)] = value
-            return out
-
-
 def major_vote_model(x_train, x_test, y_train, y_test, df_btest, model_weight=[],boundary=0.4):
     print("========majorvote=====")
     cout = Counter(y_train)
@@ -706,7 +564,7 @@ def major_vote_model(x_train, x_test, y_train, y_test, df_btest, model_weight=[]
                                  vote="probability",
                                  boundary = boundary
                                  )
-    dt_score = make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = clf.fit(x_train,y_train.astype(int))
     # clfs = cross_val_score(estimator=clf,X=x_train,y=y_train,cv=5,scoring=dt_score)
     y_pred = pd.DataFrame(clfs.predict_proba(x_train))
@@ -736,7 +594,7 @@ def svm_model(x_train, x_test, y_train, y_test, df_btest):
                   "kernel":["rbf"],
                   "gamma":[0.1]
                   }
-    dt_score = make_scorer(f1_score, pos_label=1)
+    dt_score = make_scorer(precision_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -1563,11 +1421,11 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
     cout = Counter(y_train)
     tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
-    dtrain = lgb.Dataset(x_train, list(y_train), weight=sample_weigh)
-
-    params = {'max_bin': 10,
-              'num_leaves': 64,
-               'num_trees': 50,
+    dtrain = lgb.Dataset(x_train, list(y_train),
+                         categorical_feature="auto",
+                         weight=sample_weigh)
+    params = {'max_bin': 20,
+              'num_leaves': 30,
               'metric': ['l1', 'l2'],
               # 'is_unbalance,': True,
               'learning_rate': 0.01,
@@ -1577,22 +1435,23 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
               'min_data_in_leaf': 1,
               'min_sum_hessian_in_leaf': 100,
               'ndcg_eval_at': [1, 3, 5, 10],
-              # 'sparse_threshold': 1.0,
               'device': 'cpu',
               'gpu_platform_id': 0,
               'gpu_device_id': 0,
               'feature_fraction': 0.8,
-              'max_cat_threshold': 13
+              'max_cat_threshold': 13,
+              'force_col_wise': True
               }
     evals_result = {}  # to record eval results for plotting
 
     clfs = lgb.train(params, train_set=dtrain, num_boost_round=100,
                      valid_sets=[dtrain], valid_names=None,
                      fobj=None, feval=None, init_model=None,
-                     # categorical_feature='auto',
+                     categorical_feature='auto',
                      early_stopping_rounds=None, evals_result=evals_result,
                      verbose_eval=10,
-                     keep_training_booster=False, callbacks=None)
+                     keep_training_booster=False, callbacks=None,
+                     )
     print("================训练集================")
     evalution_model(clfs, x_train, y_train)
     print("================测试集================")
@@ -1646,7 +1505,7 @@ def gcforest(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
             {"n_folds": 2, "type": "RandomForestClassifier", "n_estimators": 20, "max_depth": 5, "n_jobs": -1, "class_weight":{0: 1, 1: tt}, 'criterion': 'gini'})
         ca_config["estimators"].append(
             {"n_folds": 2, "type": "ExtraTreesClassifier", "n_estimators": 20, "max_depth": 5, "n_jobs": -1, "class_weight":{0: 1, 1: tt}, 'criterion': 'gini'})
-        ca_config["estimators"].append({"n_folds": 2, "type": "XGBClassifier", 'learning_rate': 0.1, 'max_depth': 6, 'min_child_weight': 6, 'n_estimators': 23, 'scale_pos_weight': 1.5902478791429955, 'subsample': 0.85})
+        ca_config["estimators"].append({"n_folds": 2, "type": "XGBClassifier", 'learning_rate': 0.1, 'max_depth': 6, 'min_child_weight': 6, 'n_estimators': 23, 'scale_pos_weight': tt, 'subsample': 0.85})
         config["cascade"] = ca_config
         return config
 
@@ -1679,7 +1538,7 @@ def gcforest2(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print("==========GCfroset==========")
     cout = Counter(y_train)
-    tt = cout[0.0] / cout[1.0]
+    tt = cout[0] / cout[1] - 20
 
 
     # 模型初始化
