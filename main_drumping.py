@@ -70,7 +70,7 @@ if __name__ == '__main__':
     rf_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
     # # #
     # # gbdt模型
-    gbdt_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels,axis=1),df_btest[labels])
+    gbdt_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     #  xgb模型
     xgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
@@ -110,9 +110,9 @@ if __name__ == '__main__':
                                  n_jobs=-1,
                                  )
     train, test, btest = stacking_models(clf, x_train, y_train, x_test,  df_btest.drop(labels, axis=1), 'rf', folds=5, label_split=None)
-    x_train = pd.concat([x_train, train], axis=1)
-    x_test = pd.concat([x_test, train], axis=1)
-    x_btest = pd.concat([df_btest.drop(labels, axis=1), btest], axis=1)
+    x_train = pd.concat([x_train, pd.DataFrame(train)], axis=1)
+    x_test = pd.concat([x_test, pd.DataFrame(test)], axis=1)
+    x_btest = pd.concat([df_btest.drop(labels, axis=1), pd.DataFrame(btest)], axis=1)
 
     lgb_model(x_train, x_test, y_train, y_test, x_btest, df_btest[labels])
 

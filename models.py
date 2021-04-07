@@ -51,7 +51,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print('-------------------adaboost-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
 
     clfs = AdaBoostClassifier(n_estimators=20,
@@ -64,7 +64,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         'learning_rate': [1, 0.1, 0.05],
         'algorithm': ["SAMME", "SAMME.R"]
                  }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -87,7 +87,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print('-------------------LR-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     
     clfs = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
@@ -100,7 +100,7 @@ def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         'penalty': ['l2'],
         'max_iter': [30, 50, 100,]
     }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -123,7 +123,7 @@ def rf_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     print('-------------------Rf-------------------------')
 
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = RandomForestClassifier(n_estimators=24, max_depth=5, max_features=5, random_state=5, n_jobs=-1,
                                   # class_weight={0: 1, 1: tt}
@@ -135,8 +135,8 @@ def rf_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         'max_features': range(8, 10),
         # 'class_weight': [{1: i} for i in np.linspace(tt, tt+1, 1)]
                  }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
+    make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -172,7 +172,7 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                                       min_samples_split=2, min_samples_leaf=1,
                                       max_depth=5, random_state=5)
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train==0, 1, tt)
     param_grid = {"loss": ["deviance"],                   # GBDT parameters
                   # "learning_rate": [0.001, 0.01, 0.03, 0.1, 0.3, 0.5, 1.0],
@@ -189,8 +189,8 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                   # "min_impurity_decrease": [None],
                   # "max_leaf_nodes": [None],
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
+    make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -235,7 +235,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                      "class_weight": [{1: i} for i in np.linspace(tt, tt+1, 1)],
                      "subsample": [1, 0.85]
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -259,7 +259,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 def lgb_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print("==========LGB===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -334,7 +334,7 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         random_state=5)
 
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     param_grid = {
         "learning_rate": [0.1],
@@ -345,7 +345,7 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         "min_child_weight":range(6,7),
         "max_depth": range(3, 8),
     }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -387,7 +387,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     #         cat_features.append(i)
     print('-------------------CATBOOST-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = CatBoostClassifier(
                               learning_rate=0.01, depth=9, l2_leaf_reg=0.1,
@@ -406,7 +406,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     #     # "class_weights" :[1, 7],
     }
     
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -564,7 +564,7 @@ def major_vote_model(x_train, x_test, y_train, y_test, df_btest, model_weight=[]
                                  vote="probability",
                                  boundary = boundary
                                  )
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = clf.fit(x_train,y_train.astype(int))
     # clfs = cross_val_score(estimator=clf,X=x_train,y=y_train,cv=5,scoring=dt_score)
     y_pred = pd.DataFrame(clfs.predict_proba(x_train))
@@ -594,7 +594,7 @@ def svm_model(x_train, x_test, y_train, y_test, df_btest):
                   "kernel":["rbf"],
                   "gamma":[0.1]
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -1380,7 +1380,7 @@ class MLPGradientCheck(object):
 def MLPGradientCheck_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     print('-------------------MLPGradientCheck_model-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = MLPGradientCheck(n_output=2,
                             n_features=x_train.shape[1],
@@ -1419,7 +1419,7 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
     # create dataset for lightgbm
     print("==========LGB+LR===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -1492,7 +1492,7 @@ def gcforest(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print("==========GCfroset==========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     def get_toy_config():
         config = {}
         ca_config = {}
@@ -1538,7 +1538,7 @@ def gcforest2(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print("==========GCfroset==========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
 
 
     # 模型初始化
@@ -1651,7 +1651,7 @@ def stacking_reg(clf, train_x, train_y, test_x, clf_name, folds, kf, label_split
 def stacking_clf(clf, train_x, train_y, test_x, clf_name, folds, kf, label_split=None):
 
     cout = Counter(train_y)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - 23
     sample_weigh = np.where(train_y == 0, 1, tt)
 
     clf1 = RandomForestClassifier(n_estimators=24,
@@ -1827,7 +1827,7 @@ def stacking_models(clf, train_x, train_y, test_x, btest_x, clf_name, folds, lab
         te_y = train_y[test_index]
 
         cout = Counter(tr_y)
-        tt = cout[0] / cout[1] - 20
+        tt = cout[0] / cout[1] - 23
         sample_weigh = np.where(tr_y == 0, 1, tt)
         if clf_name in ["rf", "ada", "gb", "et", "lr"]:
             clf.fit(tr_x, tr_y, sample_weight=sample_weigh)
