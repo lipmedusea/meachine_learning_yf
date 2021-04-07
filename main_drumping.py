@@ -62,44 +62,44 @@ if __name__ == '__main__':
 
     # #模型训练
     # adaboost模型
-    adaboost_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # adaboost_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     #  LR模型
-    lr_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # lr_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
     # # rf模型
-    rf_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # rf_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
     # # #
     # # gbdt模型
-    gbdt_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # gbdt_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     #  xgb模型
-    xgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # xgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     # lgb模型
-    lgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # lgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
 
     # lgb_sk
     # lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels,axis=1),df_btest[labels])
 
     # catboost
-    cat_boost_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    # cat_boost_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     #  高斯贝叶斯
     # gauss_navie_bayes(x_train, x_test, y_train, y_test, df_btest.drop(labels,axis=1),df_btest[labels])
 
     #  gbdt+lr
-    gbdt_plus_lr(x_train, x_test, y_train, y_test,
-                 df_btest.drop(labels, axis=1), df_btest[labels],
-                 numeric_features=[]
-                 )
+    # gbdt_plus_lr(x_train, x_test, y_train, y_test,
+    #              df_btest.drop(labels, axis=1), df_btest[labels],
+    #              numeric_features=[]
+    #              )
     # # gcforest
-    gcforest(x_train, x_test, y_train, y_test,
-             df_btest.drop(labels, axis=1), df_btest[labels])
+    # gcforest(x_train, x_test, y_train, y_test,
+    #          df_btest.drop(labels, axis=1), df_btest[labels])
     #
     # # gcforest2
-    gcforest2(x_train, x_test, y_train, y_test,
-             df_btest.drop(labels, axis=1), df_btest[labels])
+    # gcforest2(x_train, x_test, y_train, y_test,
+    #          df_btest.drop(labels, axis=1), df_btest[labels])
 
     # stacking_model
     clf = RandomForestClassifier(n_estimators=23,
@@ -110,9 +110,10 @@ if __name__ == '__main__':
                                  n_jobs=-1,
                                  )
     train, test, btest = stacking_models(clf, x_train, y_train, x_test,  df_btest.drop(labels, axis=1), 'rf', folds=5, label_split=None)
-    x_train = pd.concat([x_train, pd.DataFrame(train)], axis=1)
-    x_test = pd.concat([x_test, pd.DataFrame(test)], axis=1)
-    x_btest = pd.concat([df_btest.drop(labels, axis=1), pd.DataFrame(btest)], axis=1)
+
+    x_train = pd.concat([x_train, pd.DataFrame(train, columns=["stacking_0", "stacking_1"])], axis=1)
+    x_test = pd.concat([x_test, pd.DataFrame(test, columns=["stacking_0", "stacking_1"])], axis=1)
+    x_btest = pd.concat([df_btest.drop(labels, axis=1), pd.DataFrame(btest, columns=["stacking_0", "stacking_1"])], axis=1)
 
     lgb_model(x_train, x_test, y_train, y_test, x_btest, df_btest[labels])
 

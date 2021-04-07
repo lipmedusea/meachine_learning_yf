@@ -218,15 +218,15 @@ def data_clean2(df):
     df = df.drop(["member_id", 'partition', 'Unnamed: 0', 'p_date'], axis=1)
     df = df.fillna(0)
 
-    # df = pd.get_dummies(df)
+    df = pd.get_dummies(df)
     df = df.astype(np.float32)
 
-    cat_features = [
-                    "CAFE20_gender",
-                    "CAFE20_region",
-                    "CAFE20_levels"
-                    ]
-    
+    # cat_features = [
+    #                 "CAFE20_gender",
+    #                 "CAFE20_region",
+    #                 "CAFE20_levels"
+    #                 ]
+
 
     # df = feature_onehot(df, label="target_is_DD_ACTIVE", features=cat_features, condition=1)
 
