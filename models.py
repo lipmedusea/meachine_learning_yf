@@ -51,7 +51,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print('-------------------adaboost-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 21
     sample_weigh = np.where(y_train == 0, 1, tt)
 
     clfs = AdaBoostClassifier(n_estimators=20,
@@ -60,9 +60,9 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                               random_state=0
                               )
     param_grid = {
-        'n_estimators': range(20, 25),
-        'learning_rate': [1, 0.1, 0.05],
-        'algorithm': ["SAMME", "SAMME.R"]
+        'n_estimators': range(23, 25),
+        'learning_rate': [0.1,],
+        'algorithm': ["SAMME.R"]
                  }
     dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
@@ -87,7 +87,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print('-------------------LR-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 26
     sample_weigh = np.where(y_train == 0, 1, tt)
     
     clfs = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
@@ -100,6 +100,7 @@ def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         'penalty': ['l2'],
         'max_iter': [30, 50, 100,]
     }
+
     dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
@@ -115,8 +116,7 @@ def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print("================测试集================")
     evalution_model(clfs, x_test, y_test)
     print("===========b_test===================")
-    evalution_model(clfs, df_xbtest,
-                    df_ybtest)
+    evalution_model(clfs, df_xbtest,  df_ybtest)
 
 
 def rf_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
@@ -176,10 +176,10 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     sample_weigh = np.where(y_train==0, 1, tt)
     param_grid = {"loss": ["deviance"],                   # GBDT parameters
                   # "learning_rate": [0.001, 0.01, 0.03, 0.1, 0.3, 0.5, 1.0],
-                  "learning_rate": [0.01,0.1],
+                  "learning_rate": [0.1],
                   "n_estimators": range(20, 22),
-                  "subsample": [0.5, 0.8, 1.0],
-                  "criterion": ["friedman_mse", "mse"],
+                  "subsample": [0.8, 1.0],
+                  "criterion": ["friedman_mse"],
                   "max_features": range(7, 10),       # DT parameters
                   "max_depth": range(5, 8),
                   # "min_samples_split": range(2, 10),
@@ -259,7 +259,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 def lgb_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print("==========LGB===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -334,16 +334,16 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         random_state=5)
 
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 25
     sample_weigh = np.where(y_train == 0, 1, tt)
     param_grid = {
         "learning_rate": [0.1],
-        "n_estimators": range(20, 25),
+        "n_estimators": range(23, 25),
         "subsample": [0.85],  # 取多少样本，放过拟合
         "scale_pos_weight": [i for i in np.linspace(tt, tt+1, 1)],  # 类似class_weight
         # "max_features": range(7, 8),
-        "min_child_weight":range(6,7),
-        "max_depth": range(3, 8),
+        "min_child_weight": range(6, 7),
+        "max_depth": range(5, 8),
     }
     dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
@@ -387,7 +387,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     #         cat_features.append(i)
     print('-------------------CATBOOST-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 25
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = CatBoostClassifier(
                               learning_rate=0.01, depth=9, l2_leaf_reg=0.1,
@@ -395,14 +395,14 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                               )
 
     param_grid = {
-        "learning_rate": [0.01, 0.1],
-        "n_estimators": range(15, 20),
+        "learning_rate": [0.1],
+        "n_estimators": range(21, 24),
         # "loss_function": ['MultiClass',
         #                   # 'Logloss'
         #                   ],  # 取多少样本，放过拟合
     #     # "iterations": [40, 21],  # 类似class_weight
         'class_weights': [[1, i] for i in np.linspace(tt, tt+1, 1)],
-        "depth": range(5, 10),
+        "depth": range(6, 9),
     #     # "class_weights" :[1, 7],
     }
     
@@ -417,7 +417,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                     logging_level=None,
                     plot=False,
                     # sample_weight=sample_weigh,
-                    # cat_features=np.arange(14),
+                    # cat_features=range(14),
                     verbose=None)
     print(clfs.best_params_)
     # print(clfs.best_params_)
@@ -1412,6 +1412,17 @@ def MLPGradientCheck_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtes
 
 def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric_features=[]):
     if len(numeric_features) > 0:
+        x_train_cat = x_train.drop(numeric_features, axis=1)
+        x_test_cat = x_train.drop(numeric_features, axis=1)
+        x_btest_cat = x_train.drop(numeric_features, axis=1)
+
+        #  onehot编码
+        enc = OneHotEncoder()
+        enc.fit(x_train_cat)
+        train_cat = np.array(enc.transform(x_train_cat).toarray())
+        test_cat = np.array(enc.transform(x_test_cat).toarray())
+        btest_cat = np.array(enc.transform(x_btest_cat).toarray())
+
         x_train = x_train[numeric_features]
         x_test = x_test[numeric_features]
         df_xbtest = df_xbtest[numeric_features]
@@ -1419,7 +1430,7 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
     # create dataset for lightgbm
     print("==========LGB+LR===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 23
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -1469,17 +1480,25 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
     train_encode = np.array(enc.transform(y_pred_train).toarray())
     test_encode = np.array(enc.transform(y_pred_test).toarray())
     btest_encode = np.array(enc.transform(y_pred_btest).toarray())
+    print(train_encode.shape)
+    print(train_cat.shape)
+    # 合并
+    train_encodes = np.hstack((train_encode, train_cat))
+    test_encodes = np.hstack((test_encode, test_cat))
+    btest_encodes = np.hstack((btest_encode, btest_cat))
+
     # LR
+    tt = cout[0] / cout[1] - 26
+    sample_weigh = np.where(y_train == 0, 1, tt)
     lr = LogisticRegression(penalty='l2', C=0.05)
-    lr.fit(train_encode, y_train, sample_weight=sample_weigh)
+    lr.fit(train_encodes, y_train, sample_weight=sample_weigh)
 
     print("================训练集================")
-    evalution_model(lr, train_encode, y_train)
+    evalution_model(lr, train_encodes, y_train)
     print("================测试集==============")
-    evalution_model(lr, test_encode, y_test)
+    evalution_model(lr, test_encodes, y_test)
     print("===========b_test===================")
-    evalution_model(lr, btest_encode,
-                    df_ybtest)
+    evalution_model(lr, btest_encodes, df_ybtest)
 
 
 def gcforest(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):

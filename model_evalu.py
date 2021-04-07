@@ -36,6 +36,7 @@ def plot_importance(clf, features, title='feature_importancet', n=5, method=None
     plt.show()
     print(fd.head(n))
 
+
 def evalution_model(clf, x, y, pic_name='trian'):
     y_preds = clf.predict(x)
 
@@ -62,6 +63,7 @@ def evalution_model(clf, x, y, pic_name='trian'):
     #ROC曲线
     fpr, tpr, _ = roc_curve(y, y_preds)  # 计算真正率和假正率
     roc_auc = auc(fpr, tpr)  # 计算auc的值
+    print("AUC={0}".format(roc_auc))
 
     plt.figure(figsize=(10, 10))
     # 假正率为横坐标，真正率为纵坐标做曲线

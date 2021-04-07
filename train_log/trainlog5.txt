@@ -1,3 +1,4 @@
+tt - 20
 正/负 6081/200525
 32.97566189771419 34.19761499148211
 Index(['p_date', 'target_is_DD_ACTIVE', 'p3week_active', 'p4week_active',
@@ -13,6 +14,7 @@ Index(['p_date', 'target_is_DD_ACTIVE', 'p3week_active', 'p4week_active',
       dtype='object', length=165)
 x_train (144624, 164)
 -------------------adaboost-------------------------
+tt - 20
 ================训练集================
               precision    recall  f1-score   support
            0       0.98      0.98      0.98    140446
