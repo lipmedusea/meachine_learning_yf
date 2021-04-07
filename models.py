@@ -43,35 +43,28 @@ from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientB
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.svm import LinearSVC, SVC
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import log_loss, mean_absolute_error,mean_squared_error
-from sklearn.naive_bayes import MultinomialNB,GaussianNB
+from sklearn.metrics import log_loss, mean_absolute_error, mean_squared_error
+from sklearn.naive_bayes import MultinomialNB, GaussianNB
 
 
-def adaboost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
+def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print('-------------------adaboost-------------------------')
     cout = Counter(y_train)
     tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
 
-    clfs = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
-                              intercept_scaling=1, max_iter=100, multi_class='ovr',
-                              penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
-                              verbose=0, warm_start=False)
-
+    clfs = AdaBoostClassifier(n_estimators=20,
+                              learning_rate=1.0,
+                              algorithm='SAMME.R',
+                              random_state=0
+                              )
     param_grid = {
-        'C': [10, 1, 0.1, 0.5, 0.01],
-        'penalty': ['l1', 'l2'],
-        'max_iter': [200, 100, 300]
-        # 'n_estimators': range(20, 25),
-        # 'max_depth': range(5, 7),
-        # 'max_features': range(8, 10),
-        # # 'class_weight': [{1: i} for i in np.linspace(tt, tt+1, 1)]
-    }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+        'n_estimators': range(20, 25),
+        'learning_rate': [1, 0.1, 0.05],
+        'algorithm': ["SAMME", "SAMME.R"]
+                 }
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -85,34 +78,29 @@ def adaboost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print("================测试集================")
     evalution_model(clfs, x_test, y_test)
     print("===========b_test===================")
-    evalution_model(clfs, df_xbtest,
-                    df_ybtest)
+    evalution_model(clfs, df_xbtest, df_ybtest)
+    print("================Importance================")
+    plot_importance(clfs, x_train.columns,
+                    title='feature_importancet', n=30, method=0)
 
 
 def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print('-------------------LR-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     
     clfs = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
                        intercept_scaling=1, max_iter=100, multi_class='ovr',
-                       penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+                       penalty='l2', random_state=None, tol=0.0001, solver='liblinear',
                        verbose=0, warm_start=False)
 
     param_grid = {
-        'C': [10, 1, 0.1, 0.5, 0.01],
-        'penalty': ['l1', 'l2'],
-        'max_iter': [200, 100, 300]
-        # 'n_estimators': range(20, 25),
-        # 'max_depth': range(5, 7),
-        # 'max_features': range(8, 10),
-        # # 'class_weight': [{1: i} for i in np.linspace(tt, tt+1, 1)]
+        'C': [1, 0.1, 0.01],
+        'penalty': ['l2'],
+        'max_iter': [30, 50, 100,]
     }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -131,11 +119,11 @@ def lr_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                     df_ybtest)
 
 
-def rf_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
+def rf_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     print('-------------------Rf-------------------------')
 
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20 
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = RandomForestClassifier(n_estimators=24, max_depth=5, max_features=5, random_state=5, n_jobs=-1,
                                   # class_weight={0: 1, 1: tt}
@@ -147,10 +135,8 @@ def rf_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         'max_features': range(8, 10),
         # 'class_weight': [{1: i} for i in np.linspace(tt, tt+1, 1)]
                  }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
+    make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -186,8 +172,8 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                                       min_samples_split=2, min_samples_leaf=1,
                                       max_depth=5, random_state=5)
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 10
-    sample_weigh = np.where(y_train==0,1,tt)
+    tt = cout[0] / cout[1] - 20
+    sample_weigh = np.where(y_train==0, 1, tt)
     param_grid = {"loss": ["deviance"],                   # GBDT parameters
                   # "learning_rate": [0.001, 0.01, 0.03, 0.1, 0.3, 0.5, 1.0],
                   "learning_rate": [0.01,0.1],
@@ -203,8 +189,8 @@ def gbdt_mdoel(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                   # "min_impurity_decrease": [None],
                   # "max_leaf_nodes": [None],
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
+    make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -240,7 +226,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     clfs = lgb.LGBMClassifier(random_state=5,class_weight={1:4.16})
     cout = Counter(y_train)
     tt = cout[0]/cout[1]
-    sample_weigh = np.where(y_train==0,1,tt)
+    sample_weigh = np.where(y_train == 0, 1, tt)
     param_grid = {
                     "learning_rate": [0.1, 0.01],
                     "n_estimators": range(20, 25),
@@ -249,7 +235,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                      "class_weight": [{1: i} for i in np.linspace(tt, tt+1, 1)],
                      "subsample": [1, 0.85]
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -273,7 +259,7 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 def lgb_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     print("==========LGB===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -348,7 +334,7 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         random_state=5)
 
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     param_grid = {
         "learning_rate": [0.1],
@@ -359,8 +345,8 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
         "min_child_weight":range(6,7),
         "max_depth": range(3, 8),
     }
-    dt_score = make_scorer(precision_score, pos_label=1)
-    make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
+    make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -402,7 +388,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
     #         cat_features.append(i)
     print('-------------------CATBOOST-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = CatBoostClassifier(
                               learning_rate=0.01, depth=9, l2_leaf_reg=0.1,
@@ -420,7 +406,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
         "depth": range(5, 10),
     #     # "class_weights" :[1, 7],
     }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -720,7 +706,7 @@ def major_vote_model(x_train, x_test, y_train, y_test, df_btest, model_weight=[]
                                  vote="probability",
                                  boundary = boundary
                                  )
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = clf.fit(x_train,y_train.astype(int))
     # clfs = cross_val_score(estimator=clf,X=x_train,y=y_train,cv=5,scoring=dt_score)
     y_pred = pd.DataFrame(clfs.predict_proba(x_train))
@@ -750,7 +736,7 @@ def svm_model(x_train, x_test, y_train, y_test, df_btest):
                   "kernel":["rbf"],
                   "gamma":[0.1]
                   }
-    dt_score = make_scorer(precision_score, pos_label=1)
+    dt_score = make_scorer(f1_score, pos_label=1)
     clfs = GridSearchCV(estimator=clfs,
                         param_grid=param_grid,
                         scoring=dt_score,
@@ -766,76 +752,10 @@ def svm_model(x_train, x_test, y_train, y_test, df_btest):
     print("================测试集==============")
     evalution_model(clfs, x_test, y_test)
     print("===========b_test===================")
-    evalution_model(clfs, df_xbtest,
-                    df_ybtest)
-
-
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import KFold
-
-def get_stacking(clf, x_train, y_train, x_test, n_folds=10):
-    """
-    这个函数是stacking的核心，使用交叉验证的方法得到次级训练集
-    x_train, y_train, x_test 的值应该为numpy里面的数组类型 numpy.ndarray .
-    如果输入为pandas的DataFrame类型则会把报错"""
-    train_num, test_num = x_train.shape[0], x_test.shape[0]
-    second_level_train_set = np.zeros((train_num,))
-    second_level_test_set = np.zeros((test_num,))
-    test_nfolds_sets = np.zeros((test_num, n_folds))
-    kf = KFold(n_splits=n_folds)
-
-    for i,(train_index, test_index) in enumerate(kf.split(x_train)):
-        x_tra, y_tra = x_train[train_index], y_train[train_index]
-        x_tst, y_tst = x_train[test_index], y_train[test_index]
-
-        clf.fit(x_tra, y_tra)
-
-        second_level_train_set[test_index] = clf.predict(x_tst)
-        test_nfolds_sets[:,i] = clf.predict(x_test)
-
-    second_level_test_set[:] = test_nfolds_sets.mean(axis=1)
-    return second_level_train_set, second_level_test_set
 
 
 import numpy as np
 from sklearn.model_selection import KFold
-def get_stacking(clf, x_train, y_train, x_test, btest, n_folds=10):
-
-    """
-    这个函数是stacking的核心，使用交叉验证的方法得到次级训练集
-    x_train, y_train, x_test 的值应该为numpy里面的数组类型 numpy.ndarray .
-    如果输入为pandas的DataFrame类型则会把报错"""
-
-
-    train_num, test_num, btest_num = x_train.shape[0], x_test.shape[0],btest.shape[0]
-    second_level_train_set = np.zeros((train_num,))
-    second_level_test_set = np.zeros((test_num,))
-    second_level_btest_set = np.zeros((btest_num,))
-    test_nfolds_sets = np.zeros((test_num, n_folds))
-    btest_nfolds_sets = np.zeros((btest_num, n_folds))
-    kf = KFold(n_splits=n_folds)
-
-    for i,(train_index, test_index) in enumerate(kf.split(x_train)):
-        x_tra, y_tra = x_train[x_train.index.isin(train_index)], y_train[train_index]
-        x_tst, y_tst =  x_train[x_train.index.isin(test_index)], y_train[test_index]
-
-        cout = Counter(y_tra)
-        tt = cout[0] / cout[1]  - 20
-        sample_weigh = np.where(y_tra == 0, 1, tt)
-
-        clf = clf.fit(x_tra, y_tra, sample_weight=sample_weigh)
-
-        second_level_train_set[test_index] = pd.DataFrame(clf.predict_proba(x_tst))[1]
-        test_nfolds_sets[:,i] = pd.DataFrame(clf.predict_proba(x_test))[1]
-        btest_nfolds_sets[:, i] = pd.DataFrame(clf.predict_proba(btest.drop("is_sucess_by_contract",axis=1)))[1]
-
-
-    second_level_test_set[:] = test_nfolds_sets.mean(axis=1)
-    second_level_btest_set[:] = btest_nfolds_sets.mean(axis=1)
-    return second_level_train_set, second_level_test_set, second_level_btest_set
-
-
 import numpy as np
 from scipy.special import expit
 import sys
@@ -1187,10 +1107,6 @@ class NeuralNetMLP(object):
                 delta_w1_prev, delta_w2_prev = delta_w1, delta_w2
 
         return self
-
-
-from scipy.special import expit
-import sys
 
 
 class MLPGradientCheck(object):
@@ -1606,7 +1522,7 @@ class MLPGradientCheck(object):
 def MLPGradientCheck_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     print('-------------------MLPGradientCheck_model-------------------------')
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
     clfs = MLPGradientCheck(n_output=2,
                             n_features=x_train.shape[1],
@@ -1637,17 +1553,16 @@ def MLPGradientCheck_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtes
 
 
 def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric_features=[]):
-    x_train = x_train[numeric_features]
-    x_test = x_test[numeric_features]
-    df_xbtest = df_xbtest[numeric_features]
+    if len(numeric_features) > 0:
+        x_train = x_train[numeric_features]
+        x_test = x_test[numeric_features]
+        df_xbtest = df_xbtest[numeric_features]
 
     # create dataset for lightgbm
     print("==========LGB+LR===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     sample_weigh = np.where(y_train == 0, 1, tt)
-    dtrain = lgb.Dataset(x_train, list(y_train), weight=sample_weigh)
-    dtrain = lgb.Dataset(x_train, list(y_train), weight=sample_weigh)
     dtrain = lgb.Dataset(x_train, list(y_train), weight=sample_weigh)
 
     params = {'max_bin': 10,
@@ -1718,7 +1633,7 @@ def gcforest(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
 
     print("==========GCfroset==========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1]  - 20
+    tt = cout[0] / cout[1] - 20
     def get_toy_config():
         config = {}
         ca_config = {}
@@ -1875,6 +1790,76 @@ def stacking_reg(clf, train_x, train_y, test_x, clf_name, folds, kf, label_split
 
 
 def stacking_clf(clf, train_x, train_y, test_x, clf_name, folds, kf, label_split=None):
+
+    cout = Counter(train_y)
+    tt = cout[0] / cout[1] - 20
+    sample_weigh = np.where(train_y == 0, 1, tt)
+
+    clf1 = RandomForestClassifier(n_estimators=24,
+                                  max_depth=5,
+                                  max_features=5,
+                                  random_state=5,
+                                  n_jobs=-1
+                                  )
+    clf2 = GradientBoostingClassifier(loss="deviance", learning_rate=0.01,
+                                      n_estimators=20, subsample=1.0,
+                                      criterion="friedman_mse",
+                                      min_samples_split=2,
+                                      min_samples_leaf=1,
+                                      max_depth=5,
+                                      random_state=5)
+
+    clf3 = XGBClassifier(max_depth=7,
+                         min_child_weight=1,
+                         learning_rate=0.01,
+                         n_estimators=20,
+                         objective='binary:logistic',
+                         gamma=0,
+                         max_delta_step=0,
+                         subsample=1,
+                         colsample_bytree=1,
+                         colsample_bylevel=1,
+                         reg_alpha=0,
+                         reg_lambda=0,
+                         scale_pos_weight=1,
+                         seed=1,
+                         missing=None,
+                         use_label_encoder=False,
+                         random_state=5)
+
+    dtrain = lgb.Dataset(train_x, list(train_y),
+                         categorical_feature="auto",
+                         weight=sample_weigh)
+    params = {'max_bin': 20,
+              'num_leaves': 30,
+              'metric': ['l1', 'l2'],
+              # 'is_unbalance,': True,
+              'learning_rate': 0.01,
+              'tree_learner': 'serial',
+              'task': 'train',
+              'is_training_metric': 'false',
+              'min_data_in_leaf': 1,
+              'min_sum_hessian_in_leaf': 100,
+              'ndcg_eval_at': [1, 3, 5, 10],
+              'device': 'cpu',
+              'gpu_platform_id': 0,
+              'gpu_device_id': 0,
+              'feature_fraction': 0.8,
+              'max_cat_threshold': 13,
+              'force_col_wise': True
+              }
+    evals_result = {}  # to record eval results for plotting
+
+    clf4 = lgb.train(params, train_set=dtrain, num_boost_round=100,
+                     valid_sets=[dtrain], valid_names=None,
+                     fobj=None, feval=None, init_model=None,
+                     categorical_feature='auto',
+                     early_stopping_rounds=None, evals_result=evals_result,
+                     verbose_eval=10,
+                     keep_training_booster=False, callbacks=None,
+                     )
+
+
     train = np.zeros((train_x.shape[0], 1))
     test = np.zeros((test_x.shape[0], 1))
     test_pre = np.empty((folds, test_x.shape[0], 1))
@@ -1960,41 +1945,114 @@ def stacking_clf(clf, train_x, train_y, test_x, clf_name, folds, kf, label_split
     return train.reshape(-1, 1), test.reshape(-1, 1)
 
 
-def rf_reg(x_train, y_train, x_valid, kf, label_split=None):
-    randomforest = RandomForestRegressor(n_estimators=600, max_depth=20, n_jobs=-1, random_state=2017, max_features="auto",verbose=1)
-    rf_train, rf_test = stacking_reg(randomforest, x_train, y_train, x_valid, "rf", kf, label_split=label_split)
-    return rf_train, rf_test, "rf_reg"
+def stacking_models(clf, train_x, train_y, test_x, btest_x, clf_name, folds, label_split=None):
+    train_x = np.array(train_x)
+    train_y = np.array(train_y)
+    test_x = np.array(test_x)
+    btest_x = np.array(btest_x)
 
+    print("==============start_stacking================")
+    kf = KFold(folds, random_state=0, shuffle=True)
 
-def ada_reg(x_train, y_train, x_valid, kf, label_split=None):
-    adaboost = AdaBoostRegressor(n_estimators=30, random_state=2017, learning_rate=0.01)
-    ada_train, ada_test = stacking_reg(adaboost, x_train, y_train, x_valid, "ada", kf, label_split=label_split)
-    return ada_train, ada_test,"ada_reg"
+    train = np.zeros((train_x.shape[0], 2))
+    test = np.zeros((test_x.shape[0], 2))
+    test_pre = np.empty((folds, test_x.shape[0], 2))
 
+    btest = np.zeros((btest_x.shape[0], 2))
+    btest_pre = np.empty((folds, btest_x.shape[0], 2))
+    cv_scores = []
+    for i, (train_index, test_index) in enumerate(kf.split(train_x, label_split)):
+        tr_x = train_x[train_index]
+        tr_y = train_y[train_index]
+        te_x = train_x[test_index]
+        te_y = train_y[test_index]
 
-def gb_reg(x_train, y_train, x_valid, kf, label_split=None):
-    gbdt = GradientBoostingRegressor(learning_rate=0.04, n_estimators=100, subsample=0.8, random_state=2017,max_depth=5,verbose=1)
-    gbdt_train, gbdt_test = stacking_reg(gbdt, x_train, y_train, x_valid, "gb", kf, label_split=label_split)
-    return gbdt_train, gbdt_test,"gb_reg"
+        cout = Counter(tr_y)
+        tt = cout[0] / cout[1] - 20
+        sample_weigh = np.where(tr_y == 0, 1, tt)
+        if clf_name in ["rf", "ada", "gb", "et", "lr"]:
+            clf.fit(tr_x, tr_y, sample_weight=sample_weigh)
+            pre = clf.predict_proba(te_x)
+            pre1 = pre[:, 1]
+            train[test_index] = pre
+            # test
+            test_pre[i, :] = clf.predict_proba(test_x)
+            cv_scores.append(mean_squared_error(te_y, pre1))
+            # b_test
+            btest_pre[i, :] = clf.predict_proba(btest_x)
+        elif clf_name in ["xgb"]:
+            train_matrix = clf.DMatrix(tr_x, label=tr_y, missing=-1, weight=sample_weigh)
+            test_matrix = clf.DMatrix(te_x, label=te_y, missing=-1)
+            z = clf.DMatrix(test_x, label=te_y, missing=-1)
+            bz = clf.DMatrix(btest_x, label=te_y, missing=-1)
+            params = {'booster': 'gbtree',
+                      'eval_metric': 'rmse',
+                      'gamma': 1,
+                      'min_child_weight': 1.5,
+                      'max_depth': 5,
+                      'lambda': 10,
+                      'subsample': 0.8,
+                      'colsample_bytree': 0.7,
+                      'colsample_bylevel': 0.7,
+                      'eta': 0.03,
+                      'tree_method': 'exact',
+                      'seed': 2017,
+                      'nthread': 12
+                      }
+            num_round = 10000
+            early_stopping_rounds = 100
+            watchlist = [(train_matrix, 'train'),
+                         (test_matrix, 'eval')
+                         ]
+            if test_matrix:
+                model = clf.train(params,
+                                  train_matrix,
+                                  num_boost_round=num_round,
+                                  evals=watchlist,
+                                  early_stopping_rounds=early_stopping_rounds
+                                  )
+                pre = model.predict(test_matrix, ntree_limit=model.best_ntree_limit).reshape(-1, 1)
+                train[test_index] = pre
+                test_pre[i, :] = model.predict(test_x, ntree_limit=model.best_ntree_limit).reshape(-1, 1)
+                btest_pre[i, :] = model.predict(btest_x, ntree_limit=model.best_ntree_limit).reshape(-1, 1)
+                cv_scores.append(mean_squared_error(te_y, pre))
 
+        elif clf_name in ["lgb"]:
+            train_matrix = clf.Dataset(tr_x, label=tr_y, weight=sample_weigh)
+            test_matrix = clf.Dataset(te_x, label=te_y)
+            params = {
+                      'boosting_type': 'gbdt',
+                      'objective': 'regression_l2',
+                      'metric': 'mse',
+                      'min_child_weight': 1.5,
+                      'num_leaves': 2**5,
+                      'lambda_l2': 10,
+                      'subsample': 0.7,
+                      'colsample_bytree': 0.7,
+                      'colsample_bylevel': 0.7,
+                      'learning_rate': 0.03,
+                      'tree_method': 'exact',
+                      'seed': 2017,
+                      'nthread': 12,
+                      'silent': True,
+                      }
+            num_round = 10000
+            early_stopping_rounds = 100
+            if test_matrix:
+                model = clf.train(params, train_matrix, num_round, valid_sets=test_matrix,
+                                  early_stopping_rounds=early_stopping_rounds
+                                  )
+                pre = model.predict(te_x, num_iteration=model.best_iteration).reshape(-1, 1)
+                train[test_index] = pre
+                test_pre[i, :] = model.predict(test_x, num_iteration=model.best_iteration).reshape(-1, 1)
+                btest_pre[i, :] = model.predict(btest_x, num_iteration=model.best_iteration).reshape(-1, 1)
+                cv_scores.append(mean_squared_error(te_y, pre))
+        else:
+            raise IOError("Please add new clf.")
+        print("%s now score is:" % clf_name, cv_scores)
+    test[:] = test_pre.mean(axis=0)
+    btest[:] = btest_pre.mean(axis=0)
+    print("%s_score_list:" % clf_name, cv_scores)
+    print("%s_score_mean:" % clf_name, np.mean(cv_scores))
+    return train, test, btest
 
-def et_reg(x_train, y_train, x_valid, kf, label_split=None):
-    extratree = ExtraTreesRegressor(n_estimators=600, max_depth=35, max_features="auto", n_jobs=-1, random_state=2017,verbose=1)
-    et_train, et_test = stacking_reg(extratree, x_train, y_train, x_valid, "et", kf, label_split=label_split)
-    return et_train, et_test,"et_reg"
-
-
-def lr_reg(x_train, y_train, x_valid, kf, label_split=None):
-    lr_reg=LinearRegression(n_jobs=-1)
-    lr_train, lr_test = stacking_reg(lr_reg, x_train, y_train, x_valid, "lr", kf, label_split=label_split)
-    return lr_train, lr_test, "lr_reg"
-
-
-def xgb_reg(x_train, y_train, x_valid, kf, label_split=None):
-    xgb_train, xgb_test = stacking_reg(xgboost, x_train, y_train, x_valid, "xgb", kf, label_split=label_split)
-    return xgb_train, xgb_test,"xgb_reg"
-
-
-def lgb_reg(x_train, y_train, x_valid, kf, label_split=None):
-    lgb_train, lgb_test = stacking_reg(lightgbm, x_train, y_train, x_valid, "lgb", kf, label_split=label_split)
-    return lgb_train, lgb_test,"lgb_reg"

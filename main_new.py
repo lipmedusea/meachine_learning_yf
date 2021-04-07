@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore')
 from  data_treatment import load_data_yf,data_clean,seperate_label,data_seperate,load_data_new,plot_eda,data_clean,feature_extend,data_clean2,feature_onehot
-from models import lr_model,rf_mdoel,gbdt_mdoel,xgb_model,cat_boost_model,lgb_model,get_stacking, MLPGradientCheck_model,lgb_sk_mdoel,gauss_navie_bayes,gbdt_plus_lr,gcforest,gcforest2
+from models import lr_model,rf_mdoel,gbdt_mdoel,xgb_model,cat_boost_model,lgb_model, MLPGradientCheck_model,lgb_sk_mdoel,gauss_navie_bayes,gbdt_plus_lr,gcforest,gcforest2, adaboost_model
 from sklearn.metrics import make_scorer
 from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
 from model_evalu import evalution_model,plot_importance
