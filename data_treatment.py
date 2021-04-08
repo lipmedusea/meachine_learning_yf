@@ -215,20 +215,33 @@ def data_clean(df, min_date=None, mid_date="2018-04-11", max_date=None,label="")
 
 
 def data_clean2(df):
-    "CAFE20_risklevel",  # 筛选1
-    "CAFE20_IS_DAIGOU",  # 筛选0
-    "CAFE20_region_SH",
+    #  最近六个月单笔金额
+    df["p6m_avg_order_amt"] = df["CAFE20_AMT"] / (df["p6m_trans"] + 0.001)
+    # food占比
+    df["food_rate"] = df["CAFE20_VISIT_FOOD"] / (df["p6m_trans"] + 0.001)
+    #  food_bev_rate
+    df["bev_food_rate"] = df["CAFE20_VISIT_bev_food"] / (df["p6m_trans"] + 0.001)
+    #  merche_rate
+    df["merch_rate"] = df["cafe_tag_p6m_merch_qty"] / (df["p6m_trans"] + 0.001)
+    # skr_rate
+    df["skr_rate"] = df["CAFE20_VISIT_SRKIT"] / (df["p6m_trans"] + 0.001)
+
     df = df.drop(["member_id", 'partition', 'Unnamed: 0', 'p_date'], axis=1)
     df = df.fillna(0)
 
-    df = pd.get_dummies(df)
+    # df = pd.get_dummies(df)
+    cat_features = [
+        "CAFE20_gender",
+        "CAFE20_region",
+        "CAFE20_levels"
+    ]
+
+    for catfeatures in cat_features:
+        dict = {label: idx for idx, label in zip(range(len(df[catfeatures].unique())), df[catfeatures].unique())}
+        df[catfeatures] = df[catfeatures].map(dict)
+
     df = df.astype(np.float32)
 
-    # cat_features = [
-    #                 "CAFE20_gender",
-    #                 "CAFE20_region",
-    #                 "CAFE20_levels"
-    #                 ]
 
 
     # df = feature_onehot(df, label="target_is_DD_ACTIVE", features=cat_features, condition=1)

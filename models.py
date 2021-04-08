@@ -61,7 +61,7 @@ def adaboost_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                               )
     param_grid = {
         'n_estimators': range(23, 25),
-        'learning_rate': [0.1,],
+        'learning_rate': [0.1],
         'algorithm': ["SAMME.R"]
                  }
     dt_score = make_scorer(f1_score, pos_label=1)
