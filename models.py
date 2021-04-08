@@ -256,10 +256,10 @@ def lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
     #                 title='feature_importancet', n=30, method="lgb")
 
 
-def lgb_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
+def lgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, weight_bias=20):
     print("==========LGB===========")
     cout = Counter(y_train)
-    tt = cout[0] / cout[1] - 20
+    tt = cout[0] / cout[1] - weight_bias
     sample_weigh = np.where(y_train == 0, 1, tt)
     dtrain = lgb.Dataset(x_train, list(y_train),
                          categorical_feature="auto",
@@ -380,7 +380,7 @@ def xgb_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest):
                     title='feature_importancet', n=30, method=0)
 
 
-def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
+def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest,cat_features=[]):
     # cat_features = []
     # for i in range(x_train.shape[1]):
     #     if len(pd.value_counts(x_train.iloc[:, i]).index) <= 80:
@@ -417,7 +417,7 @@ def cat_boost_model(x_train,x_test,y_train,y_test,df_xbtest,df_ybtest):
                     logging_level=None,
                     plot=False,
                     # sample_weight=sample_weigh,
-                    # cat_features=range(14),
+                    cat_features=cat_features,
                     verbose=None)
     print(clfs.best_params_)
     # print(clfs.best_params_)
@@ -1411,6 +1411,9 @@ def MLPGradientCheck_model(x_train, x_test, y_train, y_test, df_xbtest, df_ybtes
 
 
 def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric_features=[]):
+    train_cat = pd.DataFrame()
+    test_cat = pd.DataFrame()
+    btest_cat = pd.DataFrame()
     if len(numeric_features) > 0:
         x_train_cat = x_train.drop(numeric_features, axis=1)
         x_test_cat = x_train.drop(numeric_features, axis=1)
@@ -1483,12 +1486,12 @@ def gbdt_plus_lr(x_train, x_test, y_train, y_test, df_xbtest, df_ybtest, numeric
     print(train_encode.shape)
     print(train_cat.shape)
     # 合并
-    train_encodes = np.hstack((train_encode, train_cat))
-    test_encodes = np.hstack((test_encode, test_cat))
-    btest_encodes = np.hstack((btest_encode, btest_cat))
+    train_encodes = pd.concat([pd.DataFrame(train_encode), pd.DataFrame(train_cat)], axis=1).astype(np.float32)
+    test_encodes = pd.concat([pd.DataFrame(test_encode), pd.DataFrame(test_cat)], axis=1).astype(np.float32)
+    btest_encodes = pd.concat([pd.DataFrame(btest_encode), pd.DataFrame(btest_cat)], axis=1).astype(np.float32)
 
     # LR
-    tt = cout[0] / cout[1] - 26
+    tt = cout[0] / cout[1] - 28
     sample_weigh = np.where(y_train == 0, 1, tt)
     lr = LogisticRegression(penalty='l2', C=0.05)
     lr.fit(train_encodes, y_train, sample_weight=sample_weigh)

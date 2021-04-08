@@ -215,6 +215,9 @@ def data_clean(df, min_date=None, mid_date="2018-04-11", max_date=None,label="")
 
 
 def data_clean2(df):
+    "CAFE20_risklevel",  # 筛选1
+    "CAFE20_IS_DAIGOU",  # 筛选0
+    "CAFE20_region_SH",
     df = df.drop(["member_id", 'partition', 'Unnamed: 0', 'p_date'], axis=1)
     df = df.fillna(0)
 

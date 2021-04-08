@@ -22,30 +22,28 @@ if __name__ == '__main__':
     warnings.filterwarnings('ignore')
     # 加载数据
     sql = "SELECT * from bidata.trail_pigeon_wdf1"
-    df = load_data_new(sql, filename="FY20_DD_modeling_partiton_sample.csv")
+    df = load_data_new(sql, filename="drumping.csv")
 
     label_by_contract = "target_is_DD_ACTIVE"
     labels = label_by_contract
 
     select_columns = [
-                      "is_festival_user"
+                      "is_festival_user",
                       "level_use",
                       "is_LAST_2YEAR_DD_ACTIVE",
                       "cafe_tag_is_mop_available",
                       "CAFE20_region_SH",
-                      "CAFE20_risklevel",  # 筛选1
-                      "CAFE20_IS_DAIGOU",  # 筛选0
                       "is_merch_user",
                       "p4week_active",
                       "is_LAST_1YEAR_DD_ACTIVE",
                       "msr_lifestatus",
                       "IS_SR_KIT_USER",
                       "member_monetary",
-                      "citytier",
+
 
                       # "CAFE20_levels_9.Welcome 1",  # onehot
                       # "CAFE20_levels_0.Gold Monthly 8+",
-
+                      "citytier",
                       "active_index",
                       "cafe_tag_p6m_food_qty",
                       "total_amt",
@@ -108,11 +106,27 @@ if __name__ == '__main__':
                       "max_MC_Quantity",
                         labels,
                       ]
+    catfeatures = ["is_festival_user",
+                   "level_use",
+                   "is_LAST_2YEAR_DD_ACTIVE",
+                   "cafe_tag_is_mop_available",
+                   "CAFE20_region_SH",
+                   "is_merch_user",
+                   "p4week_active",
+                   "is_LAST_1YEAR_DD_ACTIVE",
+                   "msr_lifestatus",
+                   "IS_SR_KIT_USER",
+                   "member_monetary"]
+
 
     #  数据预处理
     df_train, df_btest = data_clean2(df)
+    df_train = df_train[select_columns]
+    df_btest = df_btest[select_columns]
 
-
+    for cats in catfeatures:
+        df_train[cats] = df_train[cats].astype(int)
+        df_btest[cats] = df_btest[cats].astype(int)
 
     # # 抽样
     # df_train = df_train.sample(n=None, frac=0.1, replace=False, weights=None,
@@ -160,82 +174,27 @@ if __name__ == '__main__':
     xgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
 
     # lgb模型
-    lgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    lgb_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels]
+              , weight_bias=20)
 
 
     # lgb_sk
     # lgb_sk_mdoel(x_train, x_test, y_train, y_test, df_btest.drop(labels,axis=1),df_btest[labels])
 
     # catboost
-    cat_boost_model(x_train, x_test, y_train, y_test, df_btest.drop(labels, axis=1), df_btest[labels])
+    cat_boost_model(x_train, x_test, y_train, y_test,
+                    df_btest.drop(labels, axis=1),
+                    df_btest[labels],
+                    cat_features=catfeatures)
 
     #  高斯贝叶斯
     # gauss_navie_bayes(x_train, x_test, y_train, y_test, df_btest.drop(labels,axis=1),df_btest[labels])
 
     #  gbdt+lr
-    # gbdt_plus_lr(x_train, x_test, y_train, y_test,
-    #              df_btest.drop(labels, axis=1), df_btest[labels],
-    #              numeric_features=["active_index",
-    #                   "cafe_tag_p6m_food_qty",
-    #                   "total_amt",
-    #                   "DD_rev",
-    #                   "svc_revenue",
-    #                   "DDoffer_rec",
-    #                   "mop_spend",
-    #                   "recency",
-    #                   "food_party_size",
-    #                   "multi_bev",
-    #                   "MC_red_rate",
-    #                   "SR_KIT_NUM",
-    #                   "CAFE20_RECENCY_MERCH",
-    #                   "cafe_tag_p3m_merch_party_size",
-    #                   "CAFE20_VISIT_MERCH",
-    #                   "CAFE20_P1Y_AVG_TRANX_DAY",
-    #                   "CAFE20_VISIT_APP",
-    #                   "CAFE20_AI",
-    #                   "CAFE20_age",
-    #                   "CAFE20_RECENCY_APP",
-    #                   "CAFE20_RECENCY_bev_food",
-    #                   "CAFE20_AMT",
-    #                   "cafe_tag_p3m_food_qty",
-    #                   "rank_preference_food",
-    #                   "p3m_weekday_trans",
-    #                   "CAFE20_MONTHLY_FREQ",
-    #                   "monthly_freq",
-    #                   "cafe_tag_p6m_merch_party_size",
-    #                   "CAFE20_VISIT_bev_food",
-    #                   "max_DD_rev",
-    #                   "p6m_trans",
-    #                   "cafe_tag_p6m_monthly_freq",
-    #                   "DD_end_gap",
-    #                   "DD_launch_gap",
-    #                   "d10_p8week_active",
-    #                   "p6m_amt",
-    #                   "cafe_tag_p3m_merch_qty",
-    #                   "DD_order_num",
-    #                   "MC_end_gap",
-    #                   "p2w_amt",
-    #                   "CAFE20_VISIT_BEV",
-    #                   "CAFE20_RECENCY",
-    #                   "cafe_tag_p3m_monthly_freq",
-    #                   "cafe_tag_p6m_merch_qty",
-    #                   "p3m_weekly_frq",
-    #                   "total_trans",
-    #                   "DD_units",
-    #                   "max_DD_Quantity",
-    #                   "MC_rev",
-    #                   "p6m_weekday_trans",
-    #                   "MC_launch_gap",
-    #                   "MC_units",
-    #                   "cafe_tag_p3m_vist",
-    #                   "MCoffer_red",
-    #                   "CAFE20_VISIT_SRKIT",
-    #                   "p2w_trans",
-    #                   "CAFE20_RECENCY_SRKIT",
-    #                   "max_MC_rev",
-    #                   "CAFE20_P1Y_VISITS_DAY",
-    #                   "max_MC_Quantity",]
-    #              )
+    gbdt_plus_lr(x_train, x_test, y_train, y_test,
+                 df_btest.drop(labels, axis=1), df_btest[labels],
+                 numeric_features=[]
+                 )
     # # gcforest
     gcforest(x_train, x_test, y_train, y_test,
              df_btest.drop(labels, axis=1), df_btest[labels])
@@ -258,5 +217,5 @@ if __name__ == '__main__':
     x_test = pd.concat([x_test, pd.DataFrame(test, columns=["stacking_0", "stacking_1"])], axis=1)
     x_btest = pd.concat([df_btest.drop(labels, axis=1), pd.DataFrame(btest, columns=["stacking_0", "stacking_1"])], axis=1)
 
-    lgb_model(x_train, x_test, y_train, y_test, x_btest, df_btest[labels])
+    lgb_model(x_train, x_test, y_train, y_test, x_btest, df_btest[labels], weight_bias=22)
 
