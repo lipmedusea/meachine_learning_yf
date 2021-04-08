@@ -1,0 +1,79 @@
+正/负 119997/4012113
+33.43511087777195 33.107387536112256
+Index(['target_is_DD_ACTIVE', 'p3week_active', 'p4week_active',
+       'p7week_active', 'd14_p1week_active', 'd14_p2week_active',
+       'd14_p3week_active', 'd14_p4week_active', 'd14_p5week_active',
+       'd14_p6week_active',
+       ...
+       'CAFE20_levels_0', 'CAFE20_levels_0.Gold Monthly 8+',
+       'CAFE20_levels_1.Gold Monthly 4-8', 'CAFE20_levels_2.Gold Monthly 2-4',
+       'CAFE20_levels_3.Gold Monthly 1-2',
+       'CAFE20_levels_4.Gold Less than once', 'CAFE20_levels_5.Green 3+',
+       'CAFE20_levels_6.Green 1-3', 'CAFE20_levels_8.Welcome 1+',
+       'CAFE20_levels_9.Welcome 1'],
+      dtype='object', length=164)
+x_train (2892477, 163)
+-------------------adaboost-------------------------
+================训练集================
+              precision    recall  f1-score   support
+           0       0.98      0.97      0.97   2808730
+           1       0.18      0.21      0.20     83747
+    accuracy                           0.95   2892477
+   macro avg       0.58      0.59      0.59   2892477
+weighted avg       0.95      0.95      0.95   2892477
+[[2729979   78751]
+ [  65953   17794]]
+AUC=0.592217671885061
+================测试集================
+              precision    recall  f1-score   support
+           0       0.98      0.97      0.97   1203383
+           1       0.18      0.21      0.20     36250
+    accuracy                           0.95   1239633
+   macro avg       0.58      0.59      0.59   1239633
+weighted avg       0.95      0.95      0.95   1239633
+[[1169611   33772]
+ [  28629    7621]]
+AUC=0.5910851335632618
+===========b_test===================
+              precision    recall  f1-score   support
+           0       0.98      0.97      0.97    401096
+           1       0.19      0.22      0.20     12115
+    accuracy                           0.95    413211
+   macro avg       0.58      0.59      0.59    413211
+weighted avg       0.95      0.95      0.95    413211
+[[389858  11238]
+ [  9498   2617]]
+AUC=0.5939974883594025
+================Importance================
+                          features  importance
+50                       level_use       0.208
+52                is_festival_user       0.125
+29                         recency       0.125
+32                       p2w_trans       0.083
+127                     max_DD_rev       0.083
+69   cafe_tag_p6m_merch_party_size       0.083
+72           cafe_tag_p6m_food_qty       0.042
+101           CAFE20_RECENCY_SRKIT       0.042
+75               cafe_tag_p3m_vist       0.042
+87             CAFE20_MONTHLY_FREQ       0.042
+77   cafe_tag_p3m_merch_party_size       0.042
+91                      CAFE20_AMT       0.042
+51                   is_merch_user       0.042
+111          CAFE20_P1Y_VISITS_DAY       0.000
+110        CAFE20_RECENCY_bev_food       0.000
+109          CAFE20_VISIT_bev_food       0.000
+112       CAFE20_P1Y_AVG_TRANX_DAY       0.000
+115               CAFE20_IS_DAIGOU       0.000
+113                      CAFE20_AI       0.000
+114               CAFE20_risklevel       0.000
+107              CAFE20_VISIT_FOOD       0.000
+116             CAFE20_is_employee       0.000
+117        is_LAST_1YEAR_DD_ACTIVE       0.000
+118        is_LAST_2YEAR_DD_ACTIVE       0.000
+108            CAFE20_RECENCY_FOOD       0.000
+104             CAFE20_VISIT_TMALL       0.000
+106             CAFE20_RECENCY_BEV       0.000
+105               CAFE20_VISIT_BEV       0.000
+88           CAFE20_AVERAGE_TICKET       0.000
+89                  CAFE20_RECENCY       0.000
+-------------------LR-------------------------
